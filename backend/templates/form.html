@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoanEase - Instant Loan Approval Prediction</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --text-color: #333;
+            --background-color: #f8f9fa;
+            --card-background: #ffffff;
+            --input-background: #f1f3f5;
+            --input-border: #e9ecef;
+            --button-hover: #2980b9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            color: #666;
+        }
+
+        #loan-form, #result {
+            background-color: var(--card-background);
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        form {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #555;
+        }
+
+        input, select {
+            padding: 0.75rem;
+            border: 1px solid var(--input-border);
+            border-radius: 5px;
+            font-size: 1rem;
+            background-color: var(--input-background);
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: var(--button-hover);
+        }
+
+        #result {
+            text-align: center;
+        }
+
+        #result-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        #bank-list {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .bank-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background-color: var(--input-background);
+            border-radius: 5px;
+        }
+
+        .locate-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .locate-btn:hover {
+            background-color: #27ae60;
+        }
+
+        .hidden {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .form-group:not(.hidden) {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .tagline {
+                font-size: 1rem;
+            }
+
+            #loan-form, #result {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>LoanEase</h1>
+            <p class="tagline">Instant Loan Approval Prediction</p>
+        </header>
+
+        <div id="loan-form">
+            <form action="/predict" method="POST" id="form">
+                <div class="form-group">
+                    <label for="loan_type">Type of Loan</label>
+                    <select id="loan_type" name="loan_type" required>
+                        <option value="personal">Personal Loan</option>
+                        <option value="home">Home Loan</option>
+                        <option value="education">Education Loan</option>
+                        <option value="business">Business Loan</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="education">Education Level</label>
+                    <select id="education" name="education" required>
+                        <option value="0">High School or Below</option>
+                        <option value="1">College or Above</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" min="21" id="age" name="age" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="self_employed">Employment Status</label>
+                    <select id="self_employed" name="self_employed" required>
+                        <option value="0">Employed</option>
+                        <option value="1">Self-Employed</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="income_annum">Annual Income</label>
+                    <input type="number" id="income_annum" name="income_annum" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="loan_amount">Loan Amount</label>
+                    <input type="number" id="loan_amount" name="loan_amount" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="loan_term">Loan Term (in months)</label>
+                    <input type="number" min="1" id="loan_term" name="loan_term" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="cibil_score">CIBIL Score</label>
+                    <input type="number" id="cibil_score" name="cibil_score" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="location-option">Choose Location</label>
+                    <div>
+                        <input type="radio" id="current-location" name="location-option" value="current" checked>
+                        <label for="current-location">Current Location</label>
+                        <input type="radio" id="enter-city" name="location-option" value="city">
+                        <label for="enter-city">Enter City</label>
+                    </div>
+                </div>
+
+                <div class="form-group hidden" id="city-input-group">
+                    <label for="city">City Name</label>
+                    <input type="text" id="city" name="city" placeholder="Enter city name">
+                </div>
+
+                <button type="submit">Check Eligibility</button>
+            </form>
+        </div>
+
+        <div id="result" class="hidden">
+            <p id="result-text"></p>
+            <div id="bank-list"></div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('form').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                var resultDiv = document.getElementById('result');
+                var resultText = document.getElementById('result-text');
+                var bankListDiv = document.getElementById('bank-list');
+                
+                if (data.loan_status === 'Approved') {
+                    if (data.eligible_banks.length > 0) {
+                        resultText.textContent = 'Congratulations! You\'re eligible to take loan in the following banks.';
+                        bankListDiv.innerHTML = '<h3>You can check with the following banks:</h3>';
+
+                        data.eligible_banks.forEach(function (bank) {
+                            let bankElement = document.createElement('div');
+                            bankElement.className = 'bank-item';
+                            bankElement.innerHTML = `
+                                <span>${bank}</span>
+                                <button class="locate-btn" onclick="locateBank('${bank}')">
+                                    <i class="fas fa-map-marker-alt"></i> Locate
+                                </button>
+                            `;
+                            bankListDiv.appendChild(bankElement);
+                        });
+                    } else {
+                        resultText.textContent = 'Congratulations! You\'re eligible for a loan, but no banks are available at your location.';
+                    }
+                } else {
+                    resultText.textContent = 'Unfortunately, you are not eligible for a loan at this time.';
+                    bankListDiv.innerHTML = '';
+                }
+                
+                resultDiv.classList.remove('hidden');
+                
+                // Scroll to the result section smoothly
+                resultDiv.scrollIntoView({
+                    behavior: 'smooth'
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+
+        // Toggle city input based on location option
+        const locationRadios = document.getElementsByName('location-option');
+        const cityInputGroup = document.getElementById('city-input-group');
+        
+        locationRadios.forEach(radio => {
+            radio.addEventListener('change', function () {
+                if (this.value === 'city') {
+                    cityInputGroup.classList.remove('hidden');
+                } else {
+                    cityInputGroup.classList.add('hidden');
+                }
+            });
+        });
+
+        function locateBank(bankName) {
+            const selectedOption = document.querySelector('input[name="location-option"]:checked').value;
+            let origin;
+
+            if (selectedOption === 'current') {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function (position) {
+                        let lat = position.coords.latitude;
+                        let lng = position.coords.longitude;
+                        let gmapUrl = `https://www.google.com/maps/dir/?api=1&origin=${lat},${lng}&destination=${encodeURIComponent(bankName)}&travelmode=driving`;
+                        window.open(gmapUrl, '_blank');
+                    }, function (error) {
+                        console.error("Error: " + error.message);
+                        alert("Unable to retrieve your location. Please check your browser settings.");
+                    });
+                } else {
+                    alert("Geolocation is not supported by this browser.");
+                }
+            } else {
+                const cityName = document.getElementById('city').value.trim();
+                if (cityName) {
+                    let gmapUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(cityName)}&destination=${encodeURIComponent(bankName+" "+cityName)}&travelmode=driving`;
+                    window.open(gmapUrl, '_blank');
+                } else {
+                    alert("Please enter a city name.");
+                }
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+   

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoanEase - Predicted Output</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <style>
+        /* Add some basic styling to make the page look decent */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        #result {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        #result-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        #bank-list {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .bank-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background-color: #f1f3f5;
+            border-radius: 5px;
+        }
+
+        .locate-btn {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .locate-btn:hover {
+            background-color: #27ae60;
+        }
+    </style>
+</head>
+<body>
+    <div id="result">
+        <p id="result-text"></p>
+        <div id="bank-list"></div>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const loanStatus = params.get('loan_status');
+        const eligibleBanks = JSON.parse(params.get('eligible_banks'));
+
+        const resultText = document.getElementById('result-text');
+        const bankListDiv = document.getElementById('bank-list');
+
+        if (loanStatus === 'Approved') {
+            if (eligibleBanks.length > 0) {
+                resultText.textContent = 'Congratulations! You\'re eligible to take loan in the following banks.';
+                bankListDiv.innerHTML = '<h3>You can check with the following banks:</h3>';
+
+                eligibleBanks.forEach(function (bank) {
+                    let bankElement = document.createElement('div');
+                    bankElement.className = 'bank-item';
+                    bankElement.innerHTML = `
+                        <span>${bank}</span>
+                        <button class="locate-btn" onclick="locateBank('${bank}')">
+                            <i class="fas fa-map-marker-alt"></i> Locate
+                        </button>
+                    `;
+                    bankListDiv.appendChild(bankElement);
+                });
+            } else {
+                resultText.textContent = 'Congratulations! You\'re eligible for a loan, but no banks are available at your location.';
+            }
+        } else {
+            resultText.textContent = 'Unfortunately, you are not eligible for a loan at this time.';
+            bankListDiv.innerHTML = '';
+        }
+    </script>
+</body>
+</html>
